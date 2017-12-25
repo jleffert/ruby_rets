@@ -18,7 +18,8 @@ module RETS
     1 => "Fir"
   }
 
-  #OBJECT_TAGS = ['Residential', 'Property']
+  OBJECT_CLASS_TAGS = ['Residential']
+  OBJECT_TAGS = ['Property']
 
   def self.login
     @conn = Mechanize.new
@@ -129,7 +130,11 @@ module RETS
     end
   end
 
-  module RETSParser
+  module Parser
+    @current_object = ""
+    @current_class = ""
+    @object_hash = {}
+
     def self.fixXml(body)
       # Replace tags starting with numbers with text
       body.gsub(/.*\<(\d).*\>.*\<\/(\1).*>.*/) do |broken_xml|
@@ -139,28 +144,40 @@ module RETS
 
     def self.parseXML(xml, field)
         @parsed_hash = {}
+        @current_object = ""
+        @current_class = ""
+
         count = xml.xpath("/RETS/COUNT").first.attributes["Records"].value
 
-        xml.xpath("//#{field}").each do |node|
-           puts "!!!!!!!!!!!!!!!!!!!!!!!!!!!NEW #{field}!!!!!!!!!!!!!!!!!1"
-           parse_children(node)
+        xml.xpath("//#{field}").children.each do |node|
+          
+          if OBJECT_CLASS_TAGS.include? node.name
+            @current_class = node.name
+            @parsed_hash[node.name] = {}
+            parse_children(node)
+            @parsed_hash[@current_class][@current_object] << @object_hash
+          end
         end
 
-        puts "REcords: #{count}"
+        @parsed_hash
     end
 
     def self.parse_children(node)
       node.children.each do |child_node|   
-        if (child_node.children.any? rescue false)
+        if (child_node.children.any?)
           if child_node.children.length == 1 and child_node.child.text?
-              puts "#{child_node.name}: #{child_node.child.content}"
-          else
-            puts child_node.name
+              @object_hash[child_node.name] = child_node.child.content
+          elsif OBJECT_TAGS.include? child_node.name
+            @current_object = child_node.name
+            if @parsed_hash[@current_class][@current_object].nil?
+              @parsed_hash[@current_class][@current_object] = []
+            else
+              @parsed_hash[@current_class][@current_object] << @object_hash
+            end
+            @object_hash = {}
             parse_children(child_node)
-          end
-        else
-          if child_node.content !~ /^\n\s*$/
-            puts "#{child_node.content}"
+          else
+            parse_children(child_node)
           end
         end
       end
@@ -174,4 +191,4 @@ RETS.login
 @parsed_string = RETS::RETSParser.fixXml(@results.body)
 @parsed_xml = Nokogiri::XML(@parsed_string)
 
-RETS::RETSParser.parseXML(Nokogiri::XML(@parsed_string), '/REData/REProperties') #REData #REProperties
+RETS::RETSParser.parseXML(Nokogiri::XML(@parsed_string), '/REData/REProperties') #REData #REProperties  puts @parsed_hash
