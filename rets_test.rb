@@ -18,8 +18,8 @@ module RETS
     1 => "Fir"
   }
 
-  OBJECT_CLASS_TAGS = ['Residential']
-  OBJECT_TAGS = ['Property']
+  OBJECT_CLASS_TAGS = ['Residential', 'CommercialSale', 'Land', 'Member']
+  OBJECT_TAGS = ['Property', 'Member']
 
   def self.login
     @conn = Mechanize.new
@@ -114,7 +114,7 @@ module RETS
       "SearchType" => "Property",
       #Residential
       # "Class" => "MEMB",
-      "Class" => "RESI",
+      "Class" => "LOTL",
       #RETS requires queries use the lookup operator (=|) when using searching on codes of a lookup field.
       "Query" => "(City=|Lincoln),(Status=|A)",
       # "Query" => "(City=Lincoln)",(Status=|A)
@@ -198,11 +198,17 @@ end
 
 unless @response == RETS::Unauthorized
   @results = RETS.search
-  @parsed_string = RETS::Parser.fixXml(@results.body)
-  @parsed_xml = Nokogiri::XML(@parsed_string)
 
-  @parsed_hash = RETS::Parser.parseXML(Nokogiri::XML(@parsed_string), '/REData/REProperties')
-  puts @parsed_hash
+  if @results == Mechanize::ResponseCodeError
+    puts "I should make a custome error for this too but I will in the actual library"
+    puts @results.page.xml.xpath('//RETS')[0].attributes["ReplyText"].value
+  else 
+    @parsed_string = RETS::Parser.fixXml(@results.body)
+    @parsed_xml = Nokogiri::XML(@parsed_string)
+    @parsed_hash = RETS::Parser.parseXML(@parsed_xml, '/REData/REProperties') #/REProperties
+    puts @parsed_hash
+  end
 else 
   puts "Unauthorized"
+  puts @response.inspect
 end
