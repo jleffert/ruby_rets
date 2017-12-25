@@ -116,12 +116,12 @@ module RETS
       # "Class" => "MEMB",
       "Class" => "RESI",
       #RETS requires queries use the lookup operator (=|) when using searching on codes of a lookup field.
-      "Query" => "(City=|Lincoln),(StreetName=*Cottonwood*),(Status=|A)",
+      "Query" => "(City=|Lincoln),(Status=|A)",
       # "Query" => "(City=Lincoln)",(Status=|A)
       #Query Language
       "QueryType" => "DMQL2",
       "Format" => "STANDARD-XML",
-      "Limit" => "1",
+      # "Limit" => "1",
       "Count" => "1",
       "StandardNames" => "0"
     }
@@ -148,8 +148,8 @@ module RETS
         @parsed_hash = {}
         @current_object = ""
         @current_class = ""
-
         count = xml.xpath("/RETS/COUNT").first.attributes["Records"].value
+        @parsed_hash.merge!({ "Count" => count })
 
         xml.xpath("//#{field}").children.each do |node|
           
@@ -196,7 +196,7 @@ end
 
 @response = RETS.login
 
-unless @test == RETS::Unauthorized
+unless @response == RETS::Unauthorized
   @results = RETS.search
   @parsed_string = RETS::Parser.fixXml(@results.body)
   @parsed_xml = Nokogiri::XML(@parsed_string)
