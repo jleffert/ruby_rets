@@ -13,7 +13,7 @@ module RubyRETS
   	  begin
   	    conn.post(uri, query, headers)
   	  rescue Mechanize::UnauthorizedError
-  	    RETS::Unauthorized.new
+  	    raise RubyRETS::Unauthorized.new("Authorization failed. Please check your username, password, and user agent.  If all are correct please wait a second and try again.  The servers sometimes reject/lose sessions for no reason.")
   	  rescue => e
   	    @exception = e
   	  end
