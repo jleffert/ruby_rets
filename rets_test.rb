@@ -29,6 +29,8 @@ module RETS
 
    begin
       @conn.post("http://rets172lax.raprets.com:6103/Midlands/MIDL/login.aspx")
+    rescue Mechanize::UnauthorizedError
+      RETS::Unauthorized.new
     rescue => e
      @exception = e
    end
@@ -183,12 +185,24 @@ module RETS
       end
     end
   end
+
+  class Unauthorized
+      attr_reader :error_message
+      def initialize
+        @error_message = "Authorization failed. Please check your username, password, and user agent.  If all are correct please wait a second and try again.  The servers sometimes reject/lose sessions for no reason."
+      end
+  end
 end
 
-RETS.login
+@response = RETS.login
 
-@results = RETS.search
-@parsed_string = RETS::RETSParser.fixXml(@results.body)
-@parsed_xml = Nokogiri::XML(@parsed_string)
+unless @test == RETS::Unauthorized
+  @results = RETS.search
+  @parsed_string = RETS::Parser.fixXml(@results.body)
+  @parsed_xml = Nokogiri::XML(@parsed_string)
 
-RETS::RETSParser.parseXML(Nokogiri::XML(@parsed_string), '/REData/REProperties') #REData #REProperties  puts @parsed_hash
+  @parsed_hash = RETS::Parser.parseXML(Nokogiri::XML(@parsed_string), '/REData/REProperties')
+  puts @parsed_hash
+else 
+  puts "Unauthorized"
+end
