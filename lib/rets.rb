@@ -6,7 +6,7 @@ module RubyRETS
   		@auth = { username: username.to_s, password: password.to_s }
   		@user_agent = user_agent
   		@host_login = host_login
-  		@request_headers = {"RETS-Version" => RETS_VERSION}
+  		@request_headers = { "RETS-Version" => RETS_VERSION }
   	end
 
   	def post(uri, query = {}, headers = {})
