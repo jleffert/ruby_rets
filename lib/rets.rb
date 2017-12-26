@@ -1,30 +1,30 @@
 module RubyRETS
   class RETS
-  	RETS_VERSION = "RETS/1.7.2".freeze
+    RETS_VERSION = "RETS/1.7.2".freeze
 
-  	def initialize(username, password, user_agent, host_login)
-  		@auth = { username: username.to_s, password: password.to_s }
-  		@user_agent = user_agent
-  		@host_login = host_login
-  		@request_headers = { "RETS-Version" => RETS_VERSION }
-  	end
+    def initialize(username, password, user_agent, host_login)
+      @auth = { username: username.to_s, password: password.to_s }
+      @user_agent = user_agent
+      @host_login = host_login
+      @request_headers = { "RETS-Version" => RETS_VERSION }
+    end
 
-  	def post(uri, query = {}, headers = {})
-  	  begin
-  	    conn.post(uri, query, headers)
-  	  rescue Mechanize::UnauthorizedError
-  	    raise RubyRETS::Unauthorized.new()
-  	  rescue => e
-  	    @exception = e
-  	  end
-  	end
+    def post(uri, query = {}, headers = {})
+      begin
+        conn.post(uri, query, headers)
+      rescue Mechanize::UnauthorizedError
+        raise RubyRETS::Unauthorized.new()
+      rescue => e
+        @exception = e
+      end
+    end
 
     def login(login_url)
       self.post("#{@host_login}#{login_url}")
     end
 
     def logout(logout_url)
-    	self.post("#{@host_login}#{logout_url}")
+      self.post("#{@host_login}#{logout_url}")
     end
 
     def search(resource, resource_class, query_string, search_url, options = {})
