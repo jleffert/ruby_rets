@@ -55,6 +55,7 @@ module RubyRETS
       @conn.user_agent = @user_agent
       @conn.request_headers = @request_headers
       @conn.add_auth(@host_login, @auth[:username], @auth[:password])
+      @conn.pluggable_parser.xml = RubyRETS::ResponseParser
       @conn
     end
   end
