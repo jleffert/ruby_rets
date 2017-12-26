@@ -27,6 +27,24 @@ module RubyRETS
     	self.post("#{@host_login}#{logout_url}")
     end
 
+    def search(resource, resource_class, query_string, search_url, options = {})
+      options[:limit] ||= "NONE"
+      options[:offset] ||= "0"
+      query = {
+        "SearchType" => resource,
+        "Class" => resource_class,
+        "Query" => query_string,
+        "QueryType" => "DMQL2",
+        "Format" => "STANDARD-XML",
+        "Offset" => options[:offset].to_s,
+        "Limit" => options[:limit].to_s,
+        "Count" => "1",
+        "StandardNames" => "0"
+      }
+
+      self.post("#{@host_login}#{search_url}", query)
+    end
+
     private
     def conn
       @conn ||= create_connection
