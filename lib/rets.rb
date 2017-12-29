@@ -39,7 +39,7 @@ module RubyRETS
         "Offset" => options[:offset].to_s,
         "Limit" => options[:limit].to_s,
         "Count" => "1",
-        "StandardNames" => "0"
+        "StandardNames" => "1"
       }
 
       self.post("#{@host_login}#{search_url}", query)
