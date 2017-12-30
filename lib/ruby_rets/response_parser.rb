@@ -61,7 +61,7 @@ module RubyRETS
         if child_node.children.length == 1 and child_node.child.text?
           attribute_hash[child_node.name] = child_node.child.content
         elsif child_node.children.any?
-          attribute_hash[child_node.name] = parse_attributes(child_node, attribute_hash)
+          attribute_hash[child_node.name] = parse_attributes(child_node)
         else
           attribute_hash[child_node.name] = ""
         end
