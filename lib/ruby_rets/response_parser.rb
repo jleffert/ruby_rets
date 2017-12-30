@@ -22,11 +22,11 @@ module RubyRETS
 
     private
     def parse_response(body)
-      body = fix_xml_tag_names(body)
+      body = delete_extra_spaces_in_xml(body)
       parse_xml(Nokogiri::XML(body))
     end
 
-    def fix_xml_tag_names(body)
+    def delete_extra_spaces_in_xml(body)
       # Remove extra space between XML elements
       body.gsub!(/>\s*</) do |match| 
         match.gsub(/\s*/,'')
