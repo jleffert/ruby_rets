@@ -34,13 +34,14 @@ module RubyRETS
         "SearchType" => resource,
         "Class" => resource_class,
         "Query" => query_string,
-        "QueryType" => "DMQL2",
-        "Format" => "STANDARD-XML",
-        "Offset" => options[:offset].to_s,
-        "Limit" => options[:limit].to_s,
-        "Count" => "1",
-        "StandardNames" => "1"
-      }
+        "Select" => options.fetch(:select, nil),
+        "QueryType" => options.fetch(:query_type, "DMQL2"),
+        "Format" => options.fetch(:format, "COMPACT"),
+        "Offset" => options[:offset],
+        "Limit" => options[:limit],
+        "Count" => options.fetch(:count, 1),
+        "StandardNames" => options.fetch(:standard_names, 1)
+      }.reject { |x,y| y.nil? }
 
       self.post("#{@host_login}#{search_url}", query)
     end
