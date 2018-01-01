@@ -46,6 +46,17 @@ module RubyRETS
       self.post("#{@host_login}#{search_url}", query)
     end
 
+    def download(resource, type, id, object_url)
+      query = Hash.new
+      query = {
+        "Resource" => resource.to_s,
+        "Type" => type.to_s,
+        "ID" => id.to_s
+      }
+      
+      self.post("#{@host_login}#{object_url}", query)
+    end
+
     private
     def conn
       @conn ||= create_connection
