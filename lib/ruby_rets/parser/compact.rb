@@ -70,8 +70,7 @@ module RubyRETS
         hash.reject { |key, value| key.empty? && value.to_s.empty? }
       end
 
-      def self.get_count(xml)
-        doc = Nokogiri.parse(xml.to_s)
+      def self.get_count(doc)
         if node = doc.at("//COUNT")
           node.attr('Records').to_i
         else
