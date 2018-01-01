@@ -12,7 +12,10 @@ module RubyRETS
         io = StringIO.new(xml.to_s)
 
         parser.parse(io)
-        document.results.map {|data| parse_object(document.columns, data, document.delimiter) }
+        delimiter = document.delimiter || DEFAULT_DELIMITER
+        delimiter = Regexp.new(Regexp.escape(delimiter))
+        column_names = document.columns.split(delimiter)
+        document.results.map {|data| parse_object(column_names, data, delimiter) }
       end
 
       class SaxParser < Nokogiri::XML::SAX::Document
@@ -59,11 +62,7 @@ module RubyRETS
         end
       end
 
-      def self.parse_object(columns, data, delimiter = nil)
-        delimiter ||= DEFAULT_DELIMITER
-        delimiter = Regexp.new(Regexp.escape(delimiter))
-
-        column_names = columns.split(delimiter)
+      def self.parse_object(column_names, data, delimiter)
         data_values = data.split(delimiter, -1)
         zipped_key_values = column_names.zip(data_values).map { |k, v| [k, v.to_s] }
 
