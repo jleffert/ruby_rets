@@ -10,13 +10,13 @@ module RubyRETS
       if !body.empty?
         doc = Nokogiri.parse(body.to_s)
         if node = doc.at("//DELIMITER")
-          @body = Parser::Compact.parse(body)
+          @parsed = Parser::Compact.parse(body)
           @count = Parser::Compact.get_count(doc)
         elsif node = doc.at("//REData")
-          @body = Parser::Xml.parse(body)
+          @parsed = Parser::Xml.parse(body)
           @count = @body["Count"].to_i
         else
-          @body = body
+          @parsed = body
         end
       else
         self
@@ -24,7 +24,7 @@ module RubyRETS
     end
 
     def parsed
-      @body
+      @parsed
     end
 
   end
