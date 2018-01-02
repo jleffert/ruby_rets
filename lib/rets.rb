@@ -53,7 +53,7 @@ module RubyRETS
         "Type" => type.to_s,
         "ID" => id.to_s
       }
-      
+
       self.post("#{@host_login}#{object_url}", query)
     end
 
@@ -68,6 +68,7 @@ module RubyRETS
       @conn.request_headers = @request_headers
       @conn.add_auth(@host_login, @auth[:username], @auth[:password])
       @conn.pluggable_parser.xml = RubyRETS::ResponseParser
+      @conn.pluggable_parser['multipart/parallel'] = RubyRETS::ObjectParser
       @conn
     end
   end
